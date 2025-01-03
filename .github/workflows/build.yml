@@ -45,4 +45,19 @@ jobs:
         sudo xcodebuild -license accept
 
     - name: Build
-      run: dotnet build -c Release -f ${{ matrix.target }}
+      run: dotnet build -c Release -f ${{ matrix.target }} -o build-${{ matrix.target }}
+
+    - name: Zip build folder
+      run: zip -r build-${{ matrix.target }}.zip build-${{ matrix.target }}
+    
+    - name: Create Github Release
+      uses: softprops/action-gh-release@v2.1.0
+      with:
+        tag_name: testing-phase
+        name: 'Testing Phase Release'
+        files: build-${{ matrix.target }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    
+    
