@@ -1,17 +1,23 @@
-name: Build Maui App
+name: Build App
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        target: [net9.0, net9.0-android, net9.0-ios]
+        include:
+          - os: windows-latest
+            target: net9.0
+          - os: macos-latest
+            target: net9.0
+          - os: ubuntu-latest
+            target: net9.0
+          - os: windows-latest
+            target: net9.0-android
+          - os: macos-latest
+            target: net9.0-ios
 
     runs-on: ${{ matrix.os }}
 
@@ -24,13 +30,16 @@ jobs:
       with:
         dotnet-version: 9.0.x
 
+    - name: Install Android SDK (for Android builds)
+      if: ${{ matrix.target == 'net9.0-android' }}
+      run: |
+        echo "y" | sdkmanager "platforms;android-35" "build-tools;35.0.0" "system-images;android-35;google_apis;x86_64"
+
+    - name: Install Xcode (for iOS builds)
+      if: ${{ matrix.os == 'macos-latest' && matrix.target == 'net9.0-ios' }}
+      run: |
+        sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+        sudo xcodebuild -license accept
+
     - name: Build
       run: dotnet build -c Release -f ${{ matrix.target }}
-
-    - name: Build for Android
-      if: matrix.target == 'net9.0-android'
-      run: dotnet build -c Release -f net9.0-android
-
-    - name: Build for iOS
-      if: matrix.target == 'net9.0-ios'
-      run: dotnet build -c Release -f net9.0-ios
