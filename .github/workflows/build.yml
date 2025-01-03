@@ -31,7 +31,6 @@ jobs:
     - name: Install required workloads
       run: |
         dotnet workload install maui
-        dotnet workload install maui-tizen
 
     - name: Install Android SDK (for Android builds)
       if: ${{ matrix.target == 'net9.0-android' }}
