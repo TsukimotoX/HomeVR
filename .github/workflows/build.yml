@@ -1,0 +1,36 @@
+name: Build Maui App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        target: [net9.0, net9.0-android, net9.0-ios]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Build
+      run: dotnet build -c Release -f ${{ matrix.target }}
+
+    - name: Build for Android
+      if: matrix.target == 'net9.0-android'
+      run: dotnet build -c Release -f net9.0-android
+
+    - name: Build for iOS
+      if: matrix.target == 'net9.0-ios'
+      run: dotnet build -c Release -f net9.0-ios
