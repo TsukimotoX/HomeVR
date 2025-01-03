@@ -1,14 +1,12 @@
 ﻿namespace HomeVR;
 
-public partial class App : Application
+public partial class MainPage : ContentPage
 {
-	public App()
+	int count = 0;
+
+	public MainPage()
 	{
 		InitializeComponent();
 	}
-
-	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
 }
+
